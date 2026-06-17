@@ -1,0 +1,23 @@
+name: 'voucher_model'
+version: '1.0.0'
+config-version: 2
+
+vars:
+  source_schema: 'staging'
+  mart_schema: 'analytics'
+
+models:
+  voucher_model:
+    staging:
+      +schema: 'staging'
+      +materialized: 'view'
+    intermediate:
+      +schema: 'intermediate'
+      +materialized: 'view'
+    marts:
+      +schema: 'analytics'
+      +materialized: 'table'
+
+seeds:
+  voucher_model:
+    +schema: 'seeds'

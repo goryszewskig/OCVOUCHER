@@ -1,0 +1,108 @@
+version: 2
+
+models:
+  - name: dim_voucher
+    description: "Dimension table for vouchers with business attributes"
+    columns:
+      - name: voucher_key
+        description: "Surrogate key"
+        tests:
+          - unique
+          - not_null
+      - name: voucher_id
+        description: "Natural key"
+        tests:
+          - unique
+          - not_null
+      - name: voucher_code
+        tests:
+          - unique
+          - not_null
+      - name: voucher_status
+      - name: availability_status
+      - name: discount_type
+      - name: discount_value
+      - name: days_until_expiry
+
+  - name: dim_course
+    description: "Dimension table for courses"
+    columns:
+      - name: course_key
+        tests:
+          - unique
+          - not_null
+      - name: course_id
+        tests:
+          - unique
+          - not_null
+      - name: course_name
+        tests:
+          - not_null
+
+  - name: dim_student
+    description: "Dimension table for students"
+    columns:
+      - name: student_key
+        tests:
+          - unique
+          - not_null
+      - name: student_id
+        tests:
+          - unique
+          - not_null
+      - name: email
+        tests:
+          - unique
+
+  - name: fact_voucher_redemption
+    description: "Fact table for voucher redemption transactions"
+    columns:
+      - name: voucher_redemption_key
+        tests:
+          - unique
+          - not_null
+      - name: redemption_id
+        tests:
+          - unique
+          - not_null
+      - name: voucher_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_voucher')
+              field: voucher_key
+      - name: student_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_student')
+              field: student_key
+      - name: course_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_course')
+              field: course_key
+      - name: redemption_date_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: discount_applied
+        tests:
+          - not_null
+      - name: order_total
+        tests:
+          - not_null
+
+  - name: dim_date
+    description: "Date dimension for analytics"
+    columns:
+      - name: date_key
+        tests:
+          - unique
+          - not_null
+      - name: full_date
+        tests:
+          - unique

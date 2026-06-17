@@ -1,0 +1,101 @@
+version: 2
+
+sources:
+  - name: staging
+    schema: staging
+    tables:
+      - name: raw_vouchers
+        description: "Source table for vouchers"
+        columns:
+          - name: voucher_id
+            description: "Primary key"
+            tests:
+              - unique
+              - not_null
+          - name: voucher_code
+            description: "Human readable code"
+            tests:
+              - unique
+              - not_null
+          - name: voucher_type
+            description: "Type: SINGLE_USE, MULTI_USE, UNLIMITED"
+          - name: discount_type
+            description: "Type: PERCENTAGE, FIXED_AMOUNT, FREE"
+          - name: discount_value
+            description: "Discount amount or percentage"
+          - name: max_uses
+            description: "Maximum number of uses (NULL = unlimited)"
+          - name: current_uses
+            description: "Current number of uses"
+          - name: min_order_value
+            description: "Minimum order value to apply voucher"
+          - name: valid_from
+            description: "Start date of validity"
+          - name: valid_until
+            description: "End date of validity"
+          - name: is_active
+            description: "Active flag"
+          - name: created_at
+          - name: updated_at
+
+      - name: raw_courses
+        description: "Source table for courses"
+        columns:
+          - name: course_id
+            description: "Primary key"
+            tests:
+              - unique
+              - not_null
+          - name: course_name
+          - name: course_code
+          - name: category
+          - name: subcategory
+          - name: instructor_name
+          - name: price
+            description: "Course price"
+          - name: currency
+          - name: duration_hours
+          - name: difficulty_level
+            description: "BEGINNER, INTERMEDIATE, ADVANCED"
+          - name: is_published
+          - name: created_at
+          - name: updated_at
+
+      - name: raw_students
+        description: "Source table for students/customers"
+        columns:
+          - name: student_id
+            description: "Primary key"
+            tests:
+              - unique
+              - not_null
+          - name: email
+          - name: first_name
+          - name: last_name
+          - name: country
+          - name: city
+          - name: registration_date
+          - name: is_active
+          - name: created_at
+
+      - name: raw_voucher_redemptions
+        description: "Source table for voucher usage transactions"
+        columns:
+          - name: redemption_id
+            description: "Primary key"
+            tests:
+              - unique
+              - not_null
+          - name: voucher_id
+            description: "FK to voucher"
+          - name: student_id
+            description: "FK to student"
+          - name: course_id
+            description: "FK to course"
+          - name: redemption_date
+          - name: order_id
+          - name: order_total
+          - name: discount_applied
+          - name: course_price_at_redemption
+            description: "Course price at time of redemption"
+          - name: created_at
