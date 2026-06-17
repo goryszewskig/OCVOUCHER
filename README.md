@@ -144,30 +144,76 @@ JOIN dim_student s ON f.student_key = s.student_key
 GROUP BY s.full_name, s.country;
 ```
 
+## Hierarchical Dimensions
+
+### 1. Flattened Hierarchy (dim_course_hierarchy_flat)
+
+Denormalized structure with all hierarchy levels as separate columns.
+
+```
+Category L1 → Category L2 → Category L3 → Course
+  IT      →   Programming  →   Python    → Python Basics
+```
+
+| Column | Description |
+|--------|-------------|
+| `category_l1` | Top level (e.g., IT) |
+| `category_l2` | Middle level (e.g., Programming) |
+| `category_l3` | Leaf level (e.g., Python) |
+| `primary_category` | First non-null level |
+
+### 2. Recursive Hierarchy (dim_employee_recursive)
+
+Self-referencing hierarchy using MySQL 8.0 recursive CTEs.
+
+```
+CEO (depth=1)
+ ├── VP Engineering (depth=2)
+ │    ├── Manager A (depth=3)
+ │    │    ├── Senior Dev (depth=4)
+ │    │    └── Junior Dev (depth=4)
+ │    └── Manager B (depth=3)
+ └── VP Sales (depth=2)
+```
+
+| Column | Description |
+|--------|-------------|
+| `manager_id` | FK to manager employee |
+| `depth` | Level in hierarchy (1 = top) |
+| `hierarchy_path` | Full path (e.g., "John / Jane / Bob") |
+| `top_leader_name` | Root of hierarchy |
+| `level_title` | C-Level, VP/Director, Manager, Senior, Junior |
+
 ## File Structure
 
 ```
 dbt_voucher_model/
-├── dbt_project.yml          # dbt configuration
-├── packages.yml             # package dependencies
+├── dbt_project.yml
+├── packages.yml
 ├── models/
-│   ├── staging/             # Staging layer (views)
+│   ├── staging/
 │   │   ├── staging.yml
 │   │   ├── stg_vouchers.sql
 │   │   ├── stg_courses.sql
 │   │   ├── stg_students.sql
-│   │   └── stg_voucher_redemptions.sql
+│   │   ├── stg_voucher_redemptions.sql
+│   │   ├── stg_categories.sql
+│   │   ├── stg_employees.sql
+│   │   ├── stg_departments.sql
+│   │   └── stg_divisions.sql
 │   └── marts/
-│       └── core/            # Core mart layer (tables)
-│           ├── core.yml
-│           ├── dim_voucher.sql
-│           ├── dim_course.sql
-│           ├── dim_student.sql
-│           ├── dim_date.sql
-│           └── fact_voucher_redemption.sql
+│       ├── core/
+│       │   ├── dim_voucher.sql
+│       │   ├── dim_course.sql
+│       │   ├── dim_student.sql
+│       │   ├── dim_date.sql
+│       │   └── fact_voucher_redemption.sql
+│       ├── hierarchical_flat/
+│       │   └── dim_course_hierarchy_flat.sql
+│       └── hierarchical_recursive/
+│           └── dim_employee_recursive.sql
 ├── sql/
-│   ├── 01_staging_ddl.sql   # Source table DDL
-│   └── 02_mart_tables_ddl.sql
+│   └── 01_staging_ddl.sql
 └── tests/
 ```
 

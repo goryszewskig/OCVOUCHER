@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: dim_course_hierarchy_flat
+    description: "Course dimension with flattened hierarchical categories"
+    columns:
+      - name: course_hierarchy_key
+        tests:
+          - unique
+          - not_null
+      - name: course_id
+        tests:
+          - unique
+          - not_null
+      - name: category_l1
+        description: "Top level category"
+      - name: category_l2
+        description: "Middle level category"
+      - name: category_l3
+        description: "Leaf level category"
+
+  - name: dim_employee_recursive
+    description: "Employee dimension with recursive organizational hierarchy"
+    columns:
+      - name: employee_key
+        tests:
+          - unique
+          - not_null
+      - name: employee_id
+        tests:
+          - unique
+          - not_null
+      - name: manager_id
+      - name: manager_name
+        description: "Immediate manager name"
+      - name: depth
+        description: "Depth in org hierarchy (1 = top)"
+      - name: hierarchy_path
+        description: "Full path like 'John / Jane / Bob'"
+      - name: top_leader_name
+        description: "Root of hierarchy"

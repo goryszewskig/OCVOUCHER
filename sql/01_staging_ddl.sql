@@ -78,3 +78,53 @@ CREATE TABLE raw_voucher_redemptions (
     INDEX idx_student_id (student_id),
     INDEX idx_course_id (course_id)
 );
+
+-- Hierarchical Categories (for flattened dimension example)
+CREATE TABLE raw_categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL,
+    parent_category_id INT NULL,
+    level INT NOT NULL DEFAULT 1,
+    path VARCHAR(500) NOT NULL DEFAULT '/',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_category_id) REFERENCES raw_categories(category_id),
+    INDEX idx_parent (parent_category_id),
+    INDEX idx_path (path)
+);
+
+-- Divisions (for recursive employee dimension)
+CREATE TABLE raw_divisions (
+    division_id INT AUTO_INCREMENT PRIMARY KEY,
+    division_name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Departments (for recursive employee dimension)
+CREATE TABLE raw_departments (
+    department_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL,
+    division_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (division_id) REFERENCES raw_divisions(division_id),
+    INDEX idx_division (division_id)
+);
+
+-- Employees (recursive hierarchy - self-referencing)
+CREATE TABLE raw_employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    department_id INT NOT NULL,
+    manager_id INT NULL,
+    job_title VARCHAR(100) NOT NULL,
+    hire_date DATE NOT NULL,
+    salary DECIMAL(12, 2) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    level INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (department_id) REFERENCES raw_departments(department_id),
+    FOREIGN KEY (manager_id) REFERENCES raw_employees(employee_id),
+    INDEX idx_department (department_id),
+    INDEX idx_manager (manager_id)
+);
